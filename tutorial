@@ -1,0 +1,17 @@
+[e1, e2]
+[c1, c2]
+
+(e1, c1) -> e2
+(e1, c2) -> e2
+(e2, c1) -> e1
+(e2, c2) -> e1
+
+[((e1, c1), e2), ((e1, c2), e2), ((e2, c1), e1), ((e2, c2), e1)]
+
+POS : Probar que cada secuencia de pos cumple con que termina en un estado final (Aplicando funcTransicion)
+
+NEG: Probar que cada secuencia de neg, no termina en estado final
+
+Probar con estados que van de 2 a k (para lograr la minima cant de estados posibles) --ATENCION! Neg = [] => cantMinimaEstados = 1;
+
+Finalmente, formar automata :)
