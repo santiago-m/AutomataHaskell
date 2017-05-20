@@ -111,24 +111,3 @@ genListaEstados i = (Estado (i-1)):(genListaEstados (i-1))
 solucion :: [Char] -> Int -> [Char] -> [Char] -> Automata
 solucion alf k pos neg = Automata (reverse (genListaEstados (snd estadosYFuncion))) alf (snd (fst estadosYFuncion)) (Estado 0) (fst (fst estadosYFuncion))
 							where estadosYFuncion = estadosYFuncionCalculadas 1 k alf pos neg
-
-
-
-------------------------------------------FUNCIONES DEPRECATED---------------------------------------
---Funcion que Ya no se usa pero que iba a ser la posible funcion de transicion 
-funcion :: Estado -> Char -> Automata -> Estado
-funcion x y a | (pertenece y (alfabeto a)) =  head(estadosFinales a)
-			  | otherwise = x
-
-
---Funcion auxiliar que dadas dos listas de estados y una de caracteres, devuelve el subconjunto (Estado x Sigma x Estado) en forma de lista
-conjuntoTernas :: [Estado] -> [Char] -> [Estado] -> [((Estado, Char), Estado)]
-conjuntoTernas _ [] _ = []
-conjuntoTernas [] _ _ = []
-conjuntoTernas  (x:xs) (y:ys) (z:zs) = (decrementarZ (x, y) (z:zs)) ++ (conjuntoTernas xs (y:ys) (x:xs)) ++ (conjuntoTernas (x:xs) ys (x:xs))
-
-
---Funcion auxiliar que dada una tupla perteneciente a (Estado x Sigma), devuelve una lista de tuplas pertenecientes a (Estado x Sigma x Estado)
-decrementarZ :: a -> [Estado] -> [(a, Estado)]
-decrementarZ x [] = []
-decrementarZ x (y:ys) = (x, y):(decrementarZ x ys)			  
