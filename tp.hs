@@ -68,6 +68,51 @@ convertirAListaDeTuplas xs ys = filter (\s -> esFuncion s && esTotal ((length xs
 obtenerUniverso :: [Estado] -> [Char] ->[((Estado, Char), Estado)]
 obtenerUniverso xs ys = [((a, b), c) | a <- xs, b <- ys, c <- xs]
 
+--Funcion que dadas una lista de estados finales y una lista de tuplas que representa la funcion de transicion de un automata, devuelve verdadero si ambas cumplen con lo requerido por el problema.-
+probarPosYNeg :: [Estado] -> Estado -> [Char] -> [Char] -> [((Estado, Char), Estado)] -> Bool
+probarPosYNeg _ _ [] [] _ = True
+probarPosYNeg estadosFinales estadoActual [] [n] fun | not (pertenece (funFromTuples fun (estadoActual, n)) estadosFinales) = True
+													 | otherwise = False
+probarPosYNeg estadosFinales estadoActual [] (n:neg) fun = probarPosYNeg estadosFinales (funFromTuples fun (estadoActual, n)) [] neg fun
+probarPosYNeg estadosFinales estadoActual [p] neg fun  | pertenece (funFromTuples fun (estadoActual, p)) estadosFinales = True && (probarPosYNeg estadosFinales (Estado 0) [] neg fun)
+														   | otherwise = False
+probarPosYNeg estadosFinales estadoActual (p:pos) neg fun = probarPosYNeg estadosFinales (funFromTuples fun (estadoActual, p)) pos neg fun
+
+
+--Funcion auxiliar que dadas dos tuplas de listas; devuelve aquella cuyo primer elemento es distinto de la lista vacia.-
+notEmpty :: (Eq a) => ([a], [b]) -> ([a], [b]) -> ([a], [b])
+notEmpty t v | (fst t) == [] = v
+			 | otherwise = t
+
+--Funcion que calcula y devuelve la lista de estados finales del automata requerido, junto con la funcion de transicion necesaria
+obtenerEstadosYFuncion :: [[Estado]] -> [Char] -> [Char] -> [Char] -> [[((Estado, Char), Estado)]]-> ([Estado], [((Estado, Char), Estado)])
+obtenerEstadosYFuncion [] alf pos neg _ = ([], [])
+obtenerEstadosYFuncion _ alf pos neg [] = ([], [])
+obtenerEstadosYFuncion (p:posEstadosFinales) alf pos neg (f:fun) | (probarPosYNeg p (Estado 0) pos neg f) = (p, f)
+													 	 		 | otherwise = notEmpty (obtenerEstadosYFuncion (p:posEstadosFinales) alf pos neg fun) (obtenerEstadosYFuncion posEstadosFinales alf pos neg (f:fun))
+
+--Funcion que devuelve una tupla compuesta por los siguiente elementos de un automata que cumple con la consigna del problema:
+-- 	a) La lista de estados finales.
+--  b) La Funcion de transicion dada en forma de tupla.
+--  c) La cantidad minima de estados necesaria para crear el automata
+estadosYFuncionCalculadas :: Int -> Int -> [Char] -> [Char] -> [Char] -> (([Estado], [((Estado, Char), Estado)]), Int)
+estadosYFuncionCalculadas i k alf pos neg | i > k = (([], []), k+1)
+										  | (obtenerEstadosYFuncion (subs listaDeIEstados) alf pos neg (convertirAListaDeTuplas listaDeIEstados alf)) == ([], []) = estadosYFuncionCalculadas (i+1) k alf pos neg
+									  	  | otherwise = ((obtenerEstadosYFuncion (subs listaDeIEstados) alf pos neg (convertirAListaDeTuplas listaDeIEstados alf)), i)
+									  	  		where listaDeIEstados = reverse (genListaEstados i)
+
+--Dado un entero I de estados, devuelve una lista de tamanio I de estados
+genListaEstados :: Int -> [Estado]
+genListaEstados 1 = [Estado 0]
+genListaEstados i = (Estado (i-1)):(genListaEstados (i-1))
+
+--Funcion solucion al problema planteado:
+--	Dados un alfabeto, una cantidad maxima de estados k,  una sublista pos y otra neg, devuelve un automata de cantidad minima posible de estados inferior a k, que reconoce pos y no reconoce neg
+solucion :: [Char] -> Int -> [Char] -> [Char] -> Automata
+solucion alf k pos neg = Automata (reverse (genListaEstados (snd estadosYFuncion))) alf (snd (fst estadosYFuncion)) (Estado 0) (fst (fst estadosYFuncion))
+							where estadosYFuncion = estadosYFuncionCalculadas 1 k alf pos neg
+
+
 
 ------------------------------------------FUNCIONES DEPRECATED---------------------------------------
 --Funcion que Ya no se usa pero que iba a ser la posible funcion de transicion 
