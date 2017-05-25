@@ -47,17 +47,10 @@ public class Sprint {
 	public int pri () {
 		return cantPrior;
 	}
-	/*public int elemPrior (int i) {
-		return (lista.get(i)).prior();
-	}
 
-	public int elemTiemp (int i) {
-		return (lista.get(i).tiempo());
+	public void eliminarElem (int i) {
+		lista.remove(i);
 	}
-
-	public String elemNom (int i) {
-		return (lista.get(i).name());
-	}*/
 
 
 
@@ -68,7 +61,7 @@ public class Sprint {
 		if (prof >0) {
 		int i = pos;
 
-		while (original.tamanio() > i+1) {
+		while ((original.tamanio() > i+1) && (original.tiempoLim != original.tiempoAcum)) {
 			Caracteristica op1 = original.corriente(i);
 
 			if (esPosible(op1)) {
@@ -77,8 +70,14 @@ public class Sprint {
 
 			i++;
 		}
-		
-		aux2 = mejorSprint(original, pos+1, prof-1);
+
+		aux2 = aux;
+
+		if (aux.tamanio()> 0) {
+			aux2.eliminarElem(0);
+		}
+
+		aux2 = mejorSprint(original, i, prof-1);
 
 		if ( aux.pri() > aux2.pri() ) {
 			return aux;
