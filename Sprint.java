@@ -44,14 +44,26 @@ public class Sprint {
 		return lista.size();
 	}
 
-	public int pri () {
+	public int sumPrior () {
 		return cantPrior;
 	}
 
 	public void eliminarElem (int i) {
+		tiempoAcum-= corriente(i).tiempo();
+		cantPrior-= corriente(i).prior();
 		lista.remove(i);
 	}
 
+	@SuppressWarnings("unchecked")
+	private ArrayList<Caracteristica> cop () {
+		ArrayList<Caracteristica> devolver = new ArrayList<Caracteristica>();
+		devolver = (ArrayList<Caracteristica>)lista.clone();
+		return devolver;
+	}
+
+	public void copiar (Sprint asd) {
+		this.lista = asd.cop();
+	}
 
 
 	public Sprint mejorSprint (Sprint original, int pos, int prof) {
@@ -71,15 +83,17 @@ public class Sprint {
 			i++;
 		}
 
-		aux2 = aux;
+		//  La idea es que no vuelva a sumar todos hasta el elemento corriente, sino que solamente saca el primero, 
+		// y sigue viendo que otra cosa se puede agregar
+		aux2.copiar(aux);
 
 		if (aux.tamanio()> 0) {
 			aux2.eliminarElem(0);
 		}
 
-		aux2 = mejorSprint(original, i, prof-1);
+		aux2 = memoSprint(original, aux2, i, prof-1);
 
-		if ( aux.pri() > aux2.pri() ) {
+		if ( aux.sumPrior() > aux2.sumPrior() ) {
 			return aux;
 		} else {
 			return aux2;
@@ -87,7 +101,38 @@ public class Sprint {
 		return aux;
 	}
 
+	private Sprint memoSprint (Sprint original, Sprint actual, int pos, int prof) {
+		
+		Sprint aux  = new Sprint(tiempoLim);
+		Sprint aux2  = new Sprint(tiempoLim);
+		if (prof >0) {
+		int i = pos;
+		aux2 = actual;
 
+		while ((original.tamanio() > i+1)) {
+			Caracteristica op1 = original.corriente(i);
+
+			if (esPosible(op1)) {
+				aux2.newElement(op1);
+			}
+
+			i++;
+		}
+
+		aux.copiar(actual);
+		if (actual.tamanio()> 0) {
+			aux.eliminarElem(0);
+		}
+
+		aux = memoSprint(original, aux, i, prof-1);
+
+		if ( aux2.sumPrior() > aux.sumPrior() ) {
+			return aux2;
+		} else {
+			return aux;
+		}}
+		return aux;
+	}
 
 
 	public void mostrar () {

@@ -9,7 +9,7 @@ public class main {
 	//fullCaracteristicas.mostrar();
 	Sprint asd = new Sprint(20);
 
-	asd= asd.mejorSprint(fullCaracteristicas,0,2);
+	asd= asd.mejorSprint(fullCaracteristicas,0,30);
 
 	asd.mostrar();
 	System.out.println(asd.tamanio());
