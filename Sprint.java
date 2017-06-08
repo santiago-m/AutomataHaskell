@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Sprint {
 	private ArrayList<Caracteristica> lista;
+	private ArrayList<Integer> pasado;
 	private int tiempoLim; 		// tiempo maximo posible del Sprint
 	private int tiempoAcum= 0; 	// tiempo que lleva acumulado
 	private int cantPrior= 0; 	// suma de prioridades
@@ -9,6 +10,7 @@ public class Sprint {
 	public Sprint (int lim) {
 		tiempoLim = lim;
 		lista = new ArrayList<Caracteristica>();
+		pasado = new ArrayList<Integer>();
 	}
 	
 	public void newElement (String nombre, int prioridad, int tiempo) {
@@ -48,50 +50,36 @@ public class Sprint {
 		return cantPrior;
 	}
 
-	public void eliminarElem (int i) {
-		tiempoAcum-= corriente(i).tiempo();
-		cantPrior-= corriente(i).prior();
-		lista.remove(i);
+	public void usado (Integer i) {
+		pasado.add (i);
 	}
 
-	@SuppressWarnings("unchecked")
-	private ArrayList<Caracteristica> cop () {
-		ArrayList<Caracteristica> devolver = new ArrayList<Caracteristica>();
-		devolver = (ArrayList<Caracteristica>)lista.clone();
-		return devolver;
+	public boolean existe (int i) {
+		return ((this.pasado).indexOf(i) == -1 );
 	}
-
-	public void copiar (Sprint asd) {
-		this.lista = asd.cop();
-	}
-
 
 	public Sprint mejorSprint (Sprint original, int pos, int prof) {
 		
 		Sprint aux  = new Sprint(tiempoLim);
 		Sprint aux2 = new Sprint(tiempoLim);
+		Sprint aux3 = new Sprint(tiempoLim);
 		if (prof >0) {
 		int i = pos;
 
 		while ((original.tamanio() > i+1) && (original.tiempoLim != original.tiempoAcum)) {
 			Caracteristica op1 = original.corriente(i);
 
-			if (esPosible(op1)) {
+			if (aux.esPosible(op1) && (original.existe(i)) ) {
 				aux.newElement(op1);
+				original.usado(i);
 			}
 
 			i++;
 		}
 
-		//  La idea es que no vuelva a sumar todos hasta el elemento corriente, sino que solamente saca el primero, 
-		// y sigue viendo que otra cosa se puede agregar
-		aux2.copiar(aux);
+		aux2 = mejorSprint(original, pos+1, prof-1);
 
-		if (aux.tamanio()> 0) {
-			aux2.eliminarElem(0);
-		}
-
-		aux2 = memoSprint(original, aux2, i, prof-1);
+		aux3 = mejorSprint(original, i, prof)
 
 		if ( aux.sumPrior() > aux2.sumPrior() ) {
 			return aux;
@@ -101,39 +89,7 @@ public class Sprint {
 		return aux;
 	}
 
-	private Sprint memoSprint (Sprint original, Sprint actual, int pos, int prof) {
-		
-		Sprint aux  = new Sprint(tiempoLim);
-		Sprint aux2  = new Sprint(tiempoLim);
-		if (prof >0) {
-		int i = pos;
-		aux2 = actual;
-
-		while ((original.tamanio() > i+1)) {
-			Caracteristica op1 = original.corriente(i);
-
-			if (esPosible(op1)) {
-				aux2.newElement(op1);
-			}
-
-			i++;
-		}
-
-		aux.copiar(actual);
-		if (actual.tamanio()> 0) {
-			aux.eliminarElem(0);
-		}
-
-		aux = memoSprint(original, aux, i, prof-1);
-
-		if ( aux2.sumPrior() > aux.sumPrior() ) {
-			return aux2;
-		} else {
-			return aux;
-		}}
-		return aux;
-	}
-
+	
 
 	public void mostrar () {
 		for (int i=0 ; i<lista.size() ; i++)
@@ -142,16 +98,16 @@ public class Sprint {
 
 	public void carga() {
 		//	("Nombre" , Prioridad, Horas)
-		this.newElement("a",1,2);
-		this.newElement("b",2,3);
-		this.newElement("c",3,7);
+		this.newElement("a",1,7);//
+		this.newElement("b",2,10);
+		this.newElement("c",3,6); //
 		this.newElement("d",3,11);
-		this.newElement("e",1,4);
+		this.newElement("e",1,8);
 		this.newElement("f",2,13);
-		this.newElement("g",1,5);
-		this.newElement("h",1,5);
-		this.newElement("i",2,5);
-		this.newElement("j",1,1);
+		this.newElement("g",1,6); 
+		this.newElement("h",1,9);
+		this.newElement("i",2,5); //
+		this.newElement("j",1,1); //
 		this.newElement("k",3,7);
 		this.newElement("l",1,5);
 

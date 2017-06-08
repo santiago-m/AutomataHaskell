@@ -1,7 +1,7 @@
 public class Caracteristica {
     
     private String nombre; 
-    private int prioridad;  // Alta = 3 -- Media = 2 -- Baja = 0
+    private int prioridad;  // Alta = 3 -- Media = 2 -- Baja = 1
     private int tiemp;
     
     public Caracteristica (String n, int p, int t) {
